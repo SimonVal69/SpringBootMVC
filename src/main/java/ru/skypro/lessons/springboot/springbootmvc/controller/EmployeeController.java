@@ -38,27 +38,27 @@ public class EmployeeController {
         return employeeService.getEmployeeHighSalary();
     }
 
-    @PostMapping("/new/employees")
+    @PostMapping("/")
     public void addEmployee(@RequestBody List<Employee> newEmployees) {
         employeeService.addEmployee(newEmployees);
     }
 
-    @PostMapping("/employees/{id}")
+    @PutMapping("/{id}")
     public void editEmployee(@PathVariable int id, @RequestBody Employee newEmployee) {
         employeeService.editEmployee(id, newEmployee);
     }
 
-    @GetMapping("/employees/{id}")
+    @GetMapping("/{id}")
     public String getEmployeeById(@PathVariable int id) {
         return employeeService.getEmployeeById(id);
     }
 
-    @DeleteMapping("/employees/{id}")
+    @DeleteMapping("/{id}")
     public String deleteEmployeeById(@PathVariable int id) {
         return employeeService.deleteEmployeeById(id);
     }
 
-    @GetMapping("/employees/salary/higher")
+    @GetMapping("/salary/higher")
     public String getEmployeesWithSalaryHigherThan(@RequestParam("compareSalary") int compareSalary) {
         return employeeService.getEmployeesWithSalaryHigherThan(compareSalary);
     }
