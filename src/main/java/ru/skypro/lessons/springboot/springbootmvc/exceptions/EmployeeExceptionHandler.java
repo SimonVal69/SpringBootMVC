@@ -23,6 +23,6 @@ public class EmployeeExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Некорректное значение id/salary (несовпадение типа данных): " + exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid employee ID/Invalid position ID/Invalid position name/Employee not found: " + exception.getMessage());
     }
 }

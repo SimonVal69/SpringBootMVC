@@ -1,16 +1,18 @@
 package ru.skypro.lessons.springboot.springbootmvc.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import ru.skypro.lessons.springboot.springbootmvc.model.Employee;
 
 import java.util.List;
 
-public interface EmployeeRepository {
-    List<Employee> getListEmployees();
+public interface EmployeeRepository extends CrudRepository<Employee, Integer> {
+    List<Employee> findByPositionName(String positionName);
 
-    void addEmployee(List<Employee> employees);
+    List<Employee> findBySalaryGreaterThan(int compareSalary);
 
-    void editEmployee(Employee foundEmployee, Employee newEmployee);
+    List<Employee> findAllByOrderBySalaryDesc();
 
-    List<Employee> getListEmployeesForDeleting();
-
+    Page<Employee> findAll(Pageable pageable);
 }
