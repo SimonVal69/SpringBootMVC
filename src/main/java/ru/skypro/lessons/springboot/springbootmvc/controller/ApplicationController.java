@@ -39,7 +39,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/all")
-    public List<EmployeeDTO> addAllEmployees() {
+    public List<EmployeeDTO> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
