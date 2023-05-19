@@ -96,7 +96,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getEmployeesWithHighestSalary() {
-        List<Employee> employees = employeeRepository.findAllByOrderBySalaryDesc();
+        List<Employee> employees = employeeRepository.getEmployeesWithHighestSalary();
         return employees.stream()
                 .map(this::convertToDto)
                 .toList();
