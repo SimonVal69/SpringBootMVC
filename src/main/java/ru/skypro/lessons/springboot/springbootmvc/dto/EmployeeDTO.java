@@ -5,6 +5,8 @@ public class EmployeeDTO {
     private int salary;
     private String positionName;
 
+    private String departmentName;
+
     public EmployeeDTO() {
     }
 
@@ -30,5 +32,23 @@ public class EmployeeDTO {
 
     public void setPositionName(String positionName) {
         this.positionName = positionName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    @Override
+    public String toString() {
+        return "EmployeeDTO{" +
+                "name='" + name + '\'' +
+                ", salary=" + salary +
+                ", positionName='" + positionName + '\'' +
+                ", departmentName='" + departmentName + '\'' +
+                '}';
     }
 }

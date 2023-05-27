@@ -1,9 +1,15 @@
 package ru.skypro.lessons.springboot.springbootmvc.service;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.lessons.springboot.springbootmvc.dto.EmployeeDTO;
+import ru.skypro.lessons.springboot.springbootmvc.model.Report;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeService {
 
@@ -11,19 +17,29 @@ public interface EmployeeService {
 
     List<EmployeeDTO> getEmployeesByPosition(String position);
 
-    EmployeeDTO getEmployeeById(int id);
+    EmployeeDTO getEmployeeById(Long id);
 
     void addEmployee(List<EmployeeDTO> employeeDTO);
 
-    EmployeeDTO editEmployee(int id, EmployeeDTO employeeDTO);
+    EmployeeDTO editEmployee(Long id, EmployeeDTO employeeDTO);
 
-    void deleteEmployeeById(int id);
+    void deleteEmployeeById(Long id);
 
     List<EmployeeDTO> getEmployeesWithSalaryHigherThan(int compareSalary);
 
     List<EmployeeDTO> getEmployeesWithHighestSalary();
 
-    EmployeeDTO getEmployeeFullInfo(int id);
+    EmployeeDTO getEmployeeFullInfo(Long id);
 
     Page<EmployeeDTO> getEmployeesByPage(int page);
+
+    List<EmployeeDTO> loadEmployeesFromFile(MultipartFile file) throws IOException;
+
+    Long getReportByDepartment();
+
+    void generateJsonFileFromReport(Long id);
+
+    Optional<Report> getReportById(Long id);
+
+    ResponseEntity<ByteArrayResource> getReportResponseById(Long id);
 }

@@ -8,19 +8,24 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String name;
     private int salary;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id")
     private Position position;
 
-    public Employee(int id, String name, int salary, Position position) {
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    public Employee(Long id, String name, int salary, Position position, Department department) {
         this.id = id;
         this.name = name;
         this.salary = salary;
         this.position = position;
+        this.department = department;
     }
 
     public Employee() {
@@ -34,11 +39,19 @@ public class Employee {
         this.position = position;
     }
 
-    public int getId() {
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

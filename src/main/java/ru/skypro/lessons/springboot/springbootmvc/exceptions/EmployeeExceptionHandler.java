@@ -22,7 +22,12 @@ public class EmployeeExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<String> handleRuntimeException(RuntimeException runtimeException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid ID/Invalid position name/Employee not found: " + runtimeException.getMessage());
+    }
+
+    @ExceptionHandler
     public ResponseEntity<String> handleException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid employee ID/Invalid position ID/Invalid position name/Employee not found: " + exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка приложения/сервера: " + exception.getMessage());
     }
 }

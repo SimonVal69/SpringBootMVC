@@ -3,16 +3,15 @@ package ru.skypro.lessons.springboot.springbootmvc.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "position")
-public class Position {
-
+@Table(name = "department")
+public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    public Position() {
+    public Department() {
     }
 
     public Long getId() {
