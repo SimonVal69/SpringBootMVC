@@ -6,10 +6,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
 
 @RestControllerAdvice
 public class EmployeeExceptionHandler {
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ade) {
+        return ResponseEntity.status((HttpStatus.FORBIDDEN)).body(("Доступ запрещён, недостаточно прав: " + ade.getMessage()));
+    }
 
     @ExceptionHandler
     public ResponseEntity<String> handleIOException(IOException ioException) {
@@ -30,4 +36,5 @@ public class EmployeeExceptionHandler {
     public ResponseEntity<String> handleException(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка приложения/сервера: " + exception.getMessage());
     }
+
 }

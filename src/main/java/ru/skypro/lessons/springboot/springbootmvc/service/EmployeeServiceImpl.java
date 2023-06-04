@@ -154,7 +154,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Long getReportByDepartment() {
+    public Long getReportByDepartment() throws IOException {
         List<Object[]> results = employeeRepository.getReportByDepartment();
         List<ReportDTO> reportDTOs = results.stream()
                 .map(row -> {
@@ -171,14 +171,27 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void generateJsonFileFromReport(Long id) {
+    public void generateJsonFileFromReport(Long id) throws IOException {
         Report report = reportRepository.findById(id).orElse(null);
         String content = report.getContent();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(report.getFileName()))) {
             writer.write(content);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+    }
+
+    @Override
+    public ResponseEntity<ByteArrayResource> getReportResponseById(Long id) {
+        Optional<Report> reportOptional = getReportById(id);
+        if (reportOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Report report = reportOptional.get();
+        ByteArrayResource resource = new ByteArrayResource(report.getContent().getBytes());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + report.getFileName())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .contentLength(resource.contentLength())
+                .body(resource);
     }
 
     private EmployeeDTO convertToDto(Employee employee) {
@@ -201,49 +214,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
-    public Long saveReportDTOsToJsonAndInTable(List<ReportDTO> reportDTOs) {
-        Report report = null;
+    public Long saveReportDTOsToJsonAndInTable(List<ReportDTO> reportDTOs) throws IOException {
+        Report report;
         String fileName = "report";
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmm");
         String formattedDateTime = currentDateTime.format(formatter);
         String fileNameWithDateTime = fileName + "_" + formattedDateTime;
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(reportDTOs);
-            Path filePath = Files.write(Path.of(fileNameWithDateTime), json.getBytes());
-            String fileContent;
-            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-                fileContent = reader.lines()
-                        .collect(Collectors.joining(System.lineSeparator()));
-            }
-            report = new Report();
-            report.setFileName(fileNameWithDateTime);
-            report.setContent(fileContent);
-            reportRepository.save(report);
-        } catch (IOException e) {
-            e.printStackTrace();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(reportDTOs);
+        Path filePath = Files.write(Path.of(fileNameWithDateTime), json.getBytes());
+        String fileContent;
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            fileContent = reader.lines()
+                    .collect(Collectors.joining(System.lineSeparator()));
         }
-        return (report != null) ? report.getId() : null;
+        report = new Report();
+        report.setFileName(fileNameWithDateTime);
+        report.setContent(fileContent);
+        reportRepository.save(report);
+        return report.getId();
     }
 
     public Optional<Report> getReportById(Long id) {
         return reportRepository.findById(id);
     }
-
-    @Override
-    public ResponseEntity<ByteArrayResource> getReportResponseById(Long id) {
-        Optional<Report> reportOptional = getReportById(id);
-        if (reportOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Report report = reportOptional.get();
-        ByteArrayResource resource = new ByteArrayResource(report.getContent().getBytes());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + report.getFileName())
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .contentLength(resource.contentLength())
-                .body(resource);
-    }
-
 }

@@ -36,4 +36,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "GROUP BY departmentName",
             nativeQuery = true)
     List<Object[]> getReportByDepartment();
+
 }
