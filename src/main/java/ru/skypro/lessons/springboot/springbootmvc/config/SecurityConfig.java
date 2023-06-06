@@ -2,6 +2,7 @@ package ru.skypro.lessons.springboot.springbootmvc.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +11,6 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
 
@@ -31,9 +31,11 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf()
+        http
+                .csrf()
                 .disable()
                 .authorizeHttpRequests(this::configure);
 
@@ -42,17 +44,25 @@ public class SecurityConfig {
 
     private void configure(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
         try {
-            registry.requestMatchers(new AntPathRequestMatcher("/admin/**"))
+            registry
+                    .requestMatchers("/swagger-ui/**").permitAll()
+                    .requestMatchers("/**")
                     .hasAnyRole("ADMIN")
-                    .requestMatchers(new AntPathRequestMatcher("/**"))
+                    .requestMatchers(HttpMethod.GET, "/**")
                     .hasAnyRole("USER")
+                    .requestMatchers(HttpMethod.POST, "/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/**")
+                    .hasRole("ADMIN")
                     .and()
                     .formLogin().permitAll()
                     .and()
                     .logout().logoutUrl("/logout");
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 }

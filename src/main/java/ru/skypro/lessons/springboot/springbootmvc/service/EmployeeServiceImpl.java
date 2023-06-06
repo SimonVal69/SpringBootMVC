@@ -221,7 +221,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmm");
         String formattedDateTime = currentDateTime.format(formatter);
         String fileNameWithDateTime = fileName + "_" + formattedDateTime;
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(reportDTOs);
         Path filePath = Files.write(Path.of(fileNameWithDateTime), json.getBytes());
         String fileContent;
