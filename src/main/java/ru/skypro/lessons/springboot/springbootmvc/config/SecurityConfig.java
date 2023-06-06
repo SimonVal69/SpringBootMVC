@@ -45,11 +45,9 @@ public class SecurityConfig {
     private void configure(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
         try {
             registry
-                    .requestMatchers("/swagger-ui/**").permitAll()
-                    .requestMatchers("/**")
-                    .hasAnyRole("ADMIN")
+                    .requestMatchers("/v2/api-docs", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/**")
-                    .hasAnyRole("USER")
+                    .hasRole("USER")
                     .requestMatchers(HttpMethod.POST, "/**")
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/**")
