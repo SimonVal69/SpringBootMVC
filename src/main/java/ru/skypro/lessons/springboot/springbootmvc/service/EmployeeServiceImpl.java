@@ -268,7 +268,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             fileContent = reader.lines()
                     .collect(Collectors.joining(System.lineSeparator()));
         } catch (Exception e) {
-            logger.error("Ошибка создания Json файла: ", e);
+            logger.error("Ошибка чтения содержимого Json файла: ", e);
         }
         report = new Report();
         report.setFileName(fileNameWithDateTime);
