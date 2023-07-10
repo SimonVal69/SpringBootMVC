@@ -44,6 +44,47 @@ public class EmployeeControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @DisplayName("Тест для статуса 404 при неправильном id")
+    @Test
+    @SneakyThrows
+    void status404ByWrongIdTest() {
+        //Получение статуса 404 при вводе неправильного id
+        long id = 1L;
+        mockMvc.perform(get("/employees/" + id + "/fullInfo")
+                        .with(user("user_test").roles("USER")))
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Тест для статуса 404 при отсутствующем position/department")
+    @Test
+    @SneakyThrows
+    void status404NotFoundByWrongPositionOrDepartmentTest() {
+        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+        EmployeeDTO employeeDTO1 = new EmployeeDTO("John Doe", 5000, "Manager", "Sales");
+        EmployeeDTO employeeDTO2 = new EmployeeDTO("John Rick", 7000, "Manager", "Sales");
+        employeeDTOList.add(employeeDTO1);
+        employeeDTOList.add(employeeDTO2);
+
+        String jsonEmployees = new ObjectMapper().writeValueAsString(employeeDTOList);
+        //Добавление employees при отсутствующем position/department
+        mockMvc.perform(post("/employees/")
+                        .with(user("user_admin").roles("ADMIN"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonEmployees))
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Тест для статуса 404 при отсутствующем position/department")
+    @Test
+    @SneakyThrows
+    void status403ForbiddenTest() {
+        long id = 1L;
+        //Удаление employee пользователем с недостаточными правами
+        mockMvc.perform(delete("/employees/" + id)
+                        .with(user("user_test").roles("USER")))
+                .andExpect(status().isForbidden());
+    }
+
     @DisplayName("Тесты для rest-запросов по добавлению и получению данных из position")
     @Test
     @SneakyThrows
