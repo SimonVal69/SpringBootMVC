@@ -48,6 +48,7 @@ public class EmployeeControllerTest {
     @Test
     @SneakyThrows
     void status404ByWrongIdTest() {
+
         //Получение статуса 404 при вводе неправильного id
         long id = 1L;
         mockMvc.perform(get("/employees/" + id + "/fullInfo")
@@ -59,26 +60,22 @@ public class EmployeeControllerTest {
     @Test
     @SneakyThrows
     void status404NotFoundByWrongPositionOrDepartmentTest() {
-        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-        EmployeeDTO employeeDTO1 = new EmployeeDTO("John Doe", 5000, "Manager", "Sales");
-        EmployeeDTO employeeDTO2 = new EmployeeDTO("John Rick", 7000, "Manager", "Sales");
-        employeeDTOList.add(employeeDTO1);
-        employeeDTOList.add(employeeDTO2);
 
-        String jsonEmployees = new ObjectMapper().writeValueAsString(employeeDTOList);
         //Добавление employees при отсутствующем position/department
         mockMvc.perform(post("/employees/")
                         .with(user("user_admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonEmployees))
+                        .content(addEmployeesForTest()))
                 .andExpect(status().isNotFound());
     }
 
-    @DisplayName("Тест для статуса 404 при отсутствующем position/department")
+    @DisplayName("Тест для статуса 403 для пользователей с недостаточными правами")
     @Test
     @SneakyThrows
     void status403ForbiddenTest() {
+
         long id = 1L;
+
         //Удаление employee пользователем с недостаточными правами
         mockMvc.perform(delete("/employees/" + id)
                         .with(user("user_test").roles("USER")))
@@ -89,6 +86,7 @@ public class EmployeeControllerTest {
     @Test
     @SneakyThrows
     void addAndGetPositionTest() {
+
         PositionDTO positionDTO = new PositionDTO("Manager");
         String jsonPosition = new ObjectMapper().writeValueAsString(positionDTO);
 
@@ -113,24 +111,14 @@ public class EmployeeControllerTest {
     @Test
     @SneakyThrows
     void allMainRestQueryOfEmployeeTest() {
-        Position position = new Position("Manager");
-        positionRepository.save(position);
-        Department department = new Department("Sales");
-        departmentRepository.save(department);
 
-        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-        EmployeeDTO employeeDTO1 = new EmployeeDTO("John Doe", 5000, "Manager", "Sales");
-        EmployeeDTO employeeDTO2 = new EmployeeDTO("John Rick", 7000, "Manager", "Sales");
-        employeeDTOList.add(employeeDTO1);
-        employeeDTOList.add(employeeDTO2);
-
-        String jsonEmployees = new ObjectMapper().writeValueAsString(employeeDTOList);
+        addPositionAndDepartmentForTest();
 
         //Добавление employees
         mockMvc.perform(post("/employees/")
                         .with(user("user_admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonEmployees))
+                        .content(addEmployeesForTest()))
                 .andExpect(status().isOk());
 
         //Получение всех employees
@@ -195,7 +183,8 @@ public class EmployeeControllerTest {
         mockMvc.perform(put("/employees/" + id)
                         .with(user("user_admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new EmployeeDTO("Anna Doe", 6000, "Manager", "Sales"))))
+                        .content(new ObjectMapper().writeValueAsString(
+                                new EmployeeDTO("Anna Doe", 6000, "Manager", "Sales"))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(4))
@@ -210,10 +199,7 @@ public class EmployeeControllerTest {
     @SneakyThrows
     void loadEmployeesFromFileAndSaveTest() {
 
-        Position position = new Position("Manager");
-        positionRepository.save(position);
-        Department department = new Department("Sales");
-        departmentRepository.save(department);
+        addPositionAndDepartmentForTest();
 
         MockMultipartFile file = new MockMultipartFile("file", "employees.json", "application/json",
                 ("[{\"name\":\"John Doe\",\"salary\":5000,\"positionName\":\"Manager\",\"departmentName\":\"Sales\"}," +
@@ -228,5 +214,22 @@ public class EmployeeControllerTest {
                 .andExpect(header().string("Content-Type", "text/plain;charset=UTF-8"));
     }
 
+    @SneakyThrows
+    private String addEmployeesForTest() {
 
+        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+        EmployeeDTO employeeDTO1 = new EmployeeDTO("John Doe", 5000, "Manager", "Sales");
+        EmployeeDTO employeeDTO2 = new EmployeeDTO("John Rick", 7000, "Manager", "Sales");
+        employeeDTOList.add(employeeDTO1);
+        employeeDTOList.add(employeeDTO2);
+
+        return new ObjectMapper().writeValueAsString(employeeDTOList);
+    }
+
+    private void addPositionAndDepartmentForTest() {
+        Position position = new Position("Manager");
+        positionRepository.save(position);
+        Department department = new Department("Sales");
+        departmentRepository.save(department);
+    }
 }
